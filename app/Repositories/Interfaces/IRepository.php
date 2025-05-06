@@ -4,7 +4,7 @@ namespace App\Repositories\Interfaces;
 
 interface IRepository
 {
-    public function find($id);
+    public function find($id = null);
 
     public function create($data);
 

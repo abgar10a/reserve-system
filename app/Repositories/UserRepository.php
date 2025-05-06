@@ -4,11 +4,12 @@ namespace App\Repositories;
 
 use App\Models\User;
 use App\Repositories\Interfaces\IUserRepository;
+use Illuminate\Database\Eloquent\Collection;
 
 class UserRepository implements IUserRepository
 {
 
-    public function find($id)
+    public function find($id = null)
     {
         return User::find($id);
     }
@@ -33,5 +34,10 @@ class UserRepository implements IUserRepository
     public function findByEmail(string $email)
     {
         return User::where('email', $email)->first();
+    }
+
+    public function all(): Collection
+    {
+        return User::all();
     }
 }
