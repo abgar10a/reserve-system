@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Repositories\Interfaces\IUserRepository;
 use Faker\Factory;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder

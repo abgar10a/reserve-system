@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Enums\OrderStatus;
 use App\Repositories\Interfaces\IHallRepository;
 use App\Repositories\Interfaces\IOrderRepository;
 use App\Repositories\Interfaces\ITableRepository;
