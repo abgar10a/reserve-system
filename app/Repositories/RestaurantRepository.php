@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Restaurant;
 use App\Repositories\Interfaces\IRestaurantRepository;
+use Illuminate\Database\Eloquent\Builder;
 
 class RestaurantRepository implements IRestaurantRepository
 {
@@ -27,5 +28,10 @@ class RestaurantRepository implements IRestaurantRepository
     public function delete($id)
     {
         return $this->find($id)->delete();
+    }
+
+    public function query(): Builder
+    {
+        return Restaurant::query();
     }
 }

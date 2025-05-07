@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Currency;
 use App\Repositories\Interfaces\ICurrencyRepository;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class CurrencyRepository implements ICurrencyRepository
@@ -33,5 +34,10 @@ class CurrencyRepository implements ICurrencyRepository
     public function all(): Collection
     {
         return Currency::all();
+    }
+
+    public function query(): Builder
+    {
+        return Currency::query();
     }
 }

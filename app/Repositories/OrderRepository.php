@@ -4,7 +4,9 @@ namespace App\Repositories;
 
 use App\Models\Order;
 use App\Repositories\Interfaces\IOrderRepository;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 
 class OrderRepository implements IOrderRepository
 {
@@ -33,5 +35,20 @@ class OrderRepository implements IOrderRepository
     public function all(): Collection
     {
         return Order::all();
+    }
+
+    public function query(): Builder
+    {
+        return Order::query();
+    }
+
+    public function getOrdersAt($dateTime)
+    {
+        $time = Carbon::parse($dateTime);
+
+        return Order::where(static function ($query) use ($time) {
+            $query->where('start', '<=', $time);
+            $query->where('end', '>=', $time);
+        });
     }
 }

@@ -16,6 +16,7 @@ class User extends Authenticatable implements OAuthenticatable
         'name',
         'email',
         'password',
+        'role'
     ];
 
     protected $hidden = [

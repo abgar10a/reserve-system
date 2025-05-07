@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\User;
 use App\Repositories\Interfaces\IUserRepository;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class UserRepository implements IUserRepository
@@ -39,5 +40,10 @@ class UserRepository implements IUserRepository
     public function all(): Collection
     {
         return User::all();
+    }
+
+    public function query(): Builder
+    {
+        return User::query();
     }
 }

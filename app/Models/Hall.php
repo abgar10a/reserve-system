@@ -13,7 +13,7 @@ class Hall extends Model
 
     public function tables(): HasMany
     {
-        return $this->hasMany(Table::class);
+        return $this->hasMany(Table::class, 'hall', 'id');
     }
 
     public function orders(): MorphToMany

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Price;
 use App\Repositories\Interfaces\IPriceRepository;
+use Illuminate\Database\Eloquent\Builder;
 
 class PriceRepository implements IPriceRepository
 {
@@ -27,5 +28,10 @@ class PriceRepository implements IPriceRepository
     public function delete($id)
     {
         return $this->find($id)->delete();
+    }
+
+    public function query(): Builder
+    {
+        return Price::query();
     }
 }

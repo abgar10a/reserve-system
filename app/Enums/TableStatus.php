@@ -2,13 +2,11 @@
 
 namespace App\Enums;
 
-enum OrderStatus: string
+enum TableStatus: string
 {
-    case CANCELLED = 'cancelled';
-    case COMPLETED = 'completed';
-    case PROCESS = 'process';
-    case WAITING = 'waiting';
-    case PAYMENT = 'payment';
+    case FREE = 'free';
+    case OCCUPIED = 'occupied';
+    case RESERVED = 'reserved';
 
     public static function all(): array
     {

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Hall;
 use App\Repositories\Interfaces\IHallRepository;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class HallRepository implements IHallRepository
@@ -33,5 +34,10 @@ class HallRepository implements IHallRepository
     public function all(): Collection
     {
         return Hall::all();
+    }
+
+    public function query(): Builder
+    {
+        return Hall::query();
     }
 }

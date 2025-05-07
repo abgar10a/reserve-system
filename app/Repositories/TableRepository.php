@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Table;
 use App\Repositories\Interfaces\ITableRepository;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class TableRepository implements ITableRepository
@@ -33,5 +34,10 @@ class TableRepository implements ITableRepository
     public function all(): Collection
     {
         return Table::all();
+    }
+
+    public function query(): Builder
+    {
+        return Table::query();
     }
 }
