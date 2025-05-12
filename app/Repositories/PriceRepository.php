@@ -20,9 +20,9 @@ class PriceRepository implements IPriceRepository
 
     public function update($id, $data)
     {
-        $currency = $this->find($id);
-        $currency->update($data);
-        return $currency;
+        $price = $this->find($id);
+        $price->update($data);
+        return $price->refresh();
     }
 
     public function delete($id)

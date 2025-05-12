@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\OrderStatus;
 use App\Repositories\Interfaces\IHallRepository;
 use App\Repositories\Interfaces\IOrderRepository;
 use App\Repositories\Interfaces\ITableRepository;
@@ -48,7 +49,7 @@ class OrderSeeder extends Seeder
                 'user' => $user->id,
                 'start' => $start,
                 'end' => $end,
-                'status' => $faker->randomElement(['pending', 'completed', 'cancelled', 'finished']),
+                'status' => $faker->randomElement(OrderStatus::all()),
                 'entity_id' => $entity->id,
                 'entity_type' => $entityType,
             ]);

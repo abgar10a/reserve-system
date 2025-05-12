@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Services\AuthService;
+use App\Services\HallService;
 use App\Services\RestaurantService;
+use App\Services\TableService;
 use Illuminate\Support\ServiceProvider;
 
 class ActionServiceProvider extends ServiceProvider
@@ -11,6 +13,8 @@ class ActionServiceProvider extends ServiceProvider
     public $singletons = [
         AuthService::class => AuthService::class,
         RestaurantService::class => RestaurantService::class,
+        HallService::class => HallService::class,
+        TableService::class => TableService::class,
     ];
 
     public function register(): void

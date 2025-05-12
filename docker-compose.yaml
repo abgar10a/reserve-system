@@ -9,8 +9,6 @@ services:
     working_dir: /var/www
     volumes:
       - ./:/var/www
-    networks:
-      - laravel
 
   nginx:
     image: nginx:stable-alpine
@@ -22,8 +20,6 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
-    networks:
-      - laravel
 
   mysql:
     image: mysql:8.0
@@ -32,20 +28,22 @@ services:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: reserve_system
+      MYSQL_DATABASE: reserve_db
       MYSQL_USER: laravel
       MYSQL_PASSWORD: secret
-    volumes:
-      - data:/var/lib/mysql
-    networks:
-      - laravel
 
   redis:
     image: redis:alpine
     ports:
       - "6379:6379"
-    networks:
-      - laravel
+
+  redis-ui:
+    image: redis/redisinsight:latest
+    restart: always
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
 
 networks:
   laravel:

@@ -20,9 +20,24 @@ class RestaurantRepository implements IRestaurantRepository
 
     public function update($id, $data)
     {
-        $currency = $this->find($id);
-        $currency->update($data);
-        return $currency;
+        $restaurant = $this->find($id);
+
+        if (!$restaurant->exists()) {
+            $restaurant->update($data);
+        }
+
+        return $restaurant->refresh();
+    }
+
+    public function updateMeta($data)
+    {
+        $restaurant = $this->find();
+
+        if ($restaurant->exists()) {
+            $restaurant->update($data);
+        }
+
+        return $restaurant->refresh();
     }
 
     public function delete($id)

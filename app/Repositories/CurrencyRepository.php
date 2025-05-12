@@ -23,7 +23,7 @@ class CurrencyRepository implements ICurrencyRepository
     {
         $currency = $this->find($id);
         $currency->update($data);
-        return $currency;
+        return $currency->refresh();
     }
 
     public function delete($id)

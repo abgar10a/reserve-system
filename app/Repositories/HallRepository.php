@@ -21,9 +21,9 @@ class HallRepository implements IHallRepository
 
     public function update($id, $data)
     {
-        $currency = $this->find($id);
-        $currency->update($data);
-        return $currency;
+        $hall = $this->find($id);
+        $hall->update($data);
+        return $hall->refresh();
     }
 
     public function delete($id)

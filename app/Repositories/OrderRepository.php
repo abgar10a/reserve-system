@@ -22,9 +22,9 @@ class OrderRepository implements IOrderRepository
 
     public function update($id, $data)
     {
-        $currency = $this->find($id);
-        $currency->update($data);
-        return $currency;
+        $order = $this->find($id);
+        $order->update($data);
+        return $order->refresh();
     }
 
     public function delete($id)

@@ -3,17 +3,12 @@
 namespace App\Services;
 
 use App\Actions\ResponseAction;
-use App\Enums\OrderStatus;
-use App\Repositories\Interfaces\IHallRepository;
-use App\Repositories\Interfaces\IOrderRepository;
 use App\Repositories\Interfaces\IRestaurantRepository;
 
 readonly class RestaurantService
 {
     public function __construct(
         private IRestaurantRepository $restaurantRepository,
-        private IHallRepository       $hallRepository,
-        private IOrderRepository      $orderRepository,
         private HallService           $hallService)
     {
 
@@ -23,7 +18,7 @@ readonly class RestaurantService
     {
         $restaurant = $this->restaurantRepository->find();
 
-        return ResponseAction::build('Restaurant info', [
+        return ResponseAction::build('Restaurant meta', [
             'restaurant' => $restaurant,
         ]);
     }
@@ -37,6 +32,34 @@ readonly class RestaurantService
         return ResponseAction::build('Restaurant info', [
             'restaurant' => $restaurantInfo,
             'halls' => $hallsInfo,
+        ]);
+    }
+
+    public function createRestaurant($restaurantData): array
+    {
+        $metaExists = $this->restaurantRepository->find()->exists();
+
+        if ($metaExists) {
+            return ResponseAction::build(error: 'Restaurant meta already exists');
+        }
+
+        $restaurant = $this->restaurantRepository->create($restaurantData);
+
+        return ResponseAction::build('Restaurant meta created', [
+            'restaurant' => $restaurant,
+        ]);
+    }
+
+    public function updateRestaurant($restaurantData): array
+    {
+        if (empty($restaurantData)) {
+            return ResponseAction::build(error: 'Empty data');
+        }
+
+        $restaurant = $this->restaurantRepository->updateMeta($restaurantData);
+
+        return ResponseAction::build('Restaurant meta updated', [
+            'restaurant' => $restaurant,
         ]);
     }
 }

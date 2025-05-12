@@ -6,6 +6,7 @@ use App\Actions\ResponseAction;
 use App\Models\User;
 use App\Repositories\Interfaces\IUserRepository;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Throwable;
@@ -41,7 +42,7 @@ readonly class AuthService
         try {
             if ($user = $this->attempt($credentials)) {
 
-                $token = $user->createToken('API Token')->accessToken;
+                $token = $this->createToken($credentials);
 
                 return ResponseAction::build('User logged in successfully', [
                     'token' => $token,
@@ -104,5 +105,19 @@ readonly class AuthService
             'token' => $token,
             'user' => $user,
         ]);
+    }
+
+    public function createToken($credentials)
+    {
+        $response = Http::asForm()->post(config('services.passport.token_endpoint'), [
+            'grant_type' => 'password',
+            'client_id' => config('services.passport.password_client_id'),
+            'client_secret' => config('services.passport.password_client_secret'),
+            'username' => $credentials['email'],
+            'password' => $credentials['password'],
+            'scope' => ''
+        ]);
+
+        return $response->json();
     }
 }

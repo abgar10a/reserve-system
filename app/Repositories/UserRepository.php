@@ -24,7 +24,7 @@ class UserRepository implements IUserRepository
     {
         $user = User::findOrFail($id);
         $user->update($data);
-        return $user;
+        return $user->refresh();
     }
 
     public function delete($id)

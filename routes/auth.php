@@ -17,4 +17,5 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
 });

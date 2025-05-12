@@ -46,4 +46,10 @@ return [
         'client_secret' => env('GITHUB_CLIENT_SECRET'),
         'redirect' => env('GITHUB_REDIRECT_URI'),
     ],
+
+    'passport' => [
+        'password_client_id' => env('PASSPORT_PASSWORD_GRANT_CLIENT_ID'),
+        'password_client_secret' => env('PASSPORT_PASSWORD_GRANT_CLIENT_SECRET'),
+        'token_endpoint' => env('PASSPORT_TOKEN_ENDPOINT', env('APP_URL') . '/oauth/token'),
+    ],
 ];

@@ -21,9 +21,9 @@ class TableRepository implements ITableRepository
 
     public function update($id, $data)
     {
-        $currency = $this->find($id);
-        $currency->update($data);
-        return $currency;
+        $table = $this->find($id);
+        $table->update($data);
+        return $table->refresh();
     }
 
     public function delete($id)
