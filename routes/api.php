@@ -22,16 +22,16 @@ Route::get('/halls/{id}', [HallController::class, 'show']);
 // auth routes
 Route::middleware(ApiGuardAuthCheckMiddleware::class)->group(function () {
     // personal info
-    Route::get('/users', [UserController::class, 'show']);
-    Route::patch('/users', [UserController::class, 'update']);
-    Route::delete('/users', [UserController::class, 'delete']);
+    Route::get('/users/{id}', [UserController::class, 'show']);
+    Route::patch('/users/{id}', [UserController::class, 'update']);
+    Route::delete('/users/{id}', [UserController::class, 'delete']);
 
     // orders
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::post('/orders', [OrderController::class, 'store']);
-    Route::patch('/orders', [OrderController::class, 'update']);
-    Route::delete('/orders', [OrderController::class, 'delete']);
+    Route::patch('/orders/{id}', [OrderController::class, 'update']);
+    Route::delete('/orders/{id}', [OrderController::class, 'delete']);
 });
 
 // admin routes

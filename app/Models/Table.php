@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Table extends Model
 {
@@ -17,13 +17,13 @@ class Table extends Model
         return $this->belongsTo(Hall::class);
     }
 
-    public function orders(): MorphToMany
+    public function orders(): MorphMany
     {
-        return $this->morphToMany(Order::class, 'entity');
+        return $this->morphMany(Order::class, 'entity');
     }
 
-    public function price(): MorphToMany
+    public function price(): MorphOne
     {
-        return $this->morphToMany(Price::class, 'entity');
+        return $this->morphOne(Price::class, 'entity');
     }
 }

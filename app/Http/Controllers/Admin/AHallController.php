@@ -11,7 +11,8 @@ use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class AHallController extends Controller
 {
-    public function __construct(private readonly HallService $hallService){
+    public function __construct(private readonly HallService $hallService)
+    {
 
     }
 

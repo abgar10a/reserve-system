@@ -34,4 +34,12 @@ class PriceRepository implements IPriceRepository
     {
         return Price::query();
     }
+
+    public function getPriceForEntity($type, $id)
+    {
+        return Price::where(function ($query) use ($type, $id) {
+            $query->where('entity_type', $type);
+            $query->where('entity_id', $id);
+        })->first();
+    }
 }

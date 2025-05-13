@@ -11,6 +11,8 @@ class Currency extends Model
 
     protected $fillable = ['name', 'code', 'symbol'];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function prices(): BelongsToMany
     {
         return $this->belongsToMany(Price::class);

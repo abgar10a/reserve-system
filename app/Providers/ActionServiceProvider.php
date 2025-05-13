@@ -6,6 +6,7 @@ use App\Services\AuthService;
 use App\Services\HallService;
 use App\Services\RestaurantService;
 use App\Services\TableService;
+use App\Services\UserService;
 use Illuminate\Support\ServiceProvider;
 
 class ActionServiceProvider extends ServiceProvider
@@ -15,6 +16,7 @@ class ActionServiceProvider extends ServiceProvider
         RestaurantService::class => RestaurantService::class,
         HallService::class => HallService::class,
         TableService::class => TableService::class,
+        UserService::class => UserService::class,
     ];
 
     public function register(): void

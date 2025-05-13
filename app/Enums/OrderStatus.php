@@ -19,4 +19,9 @@ enum OrderStatus: string
 
         return $cases;
     }
+
+    public static function ended(): array
+    {
+        return [self::CANCELLED->value, self::COMPLETED->value];
+    }
 }

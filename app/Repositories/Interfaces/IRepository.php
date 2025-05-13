@@ -2,6 +2,8 @@
 
 namespace App\Repositories\Interfaces;
 
+use Illuminate\Database\Eloquent\Builder;
+
 interface IRepository
 {
     public function find($id = null);
@@ -12,5 +14,5 @@ interface IRepository
 
     public function delete($id);
 
-    public function query();
+    public function query(): Builder;
 }

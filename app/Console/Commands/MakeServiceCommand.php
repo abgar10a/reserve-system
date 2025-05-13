@@ -15,7 +15,7 @@ class MakeServiceCommand extends Command
         $name = $this->argument('name');
         $serviceName = $name . 'Service';
         $repositoryName = 'I' . $name . 'Repository';
-        $varName = '$' . strtolower($name);
+        $varName = '$' . strtolower($name) . 'Repository';
 
         $serviceNamespace = 'App\\Services';
 
@@ -30,7 +30,7 @@ namespace $serviceNamespace;
 
 use App\Repositories\Interfaces\\$repositoryName;
 
-class $serviceName
+readonly class $serviceName
 {
     public function __construct(private readonly $repositoryName $varName)
     {
