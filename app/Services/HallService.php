@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Actions\ResponseAction;
+use App\Enums\ResponseStatus;
 use App\Enums\TableStatus;
 use App\Models\Table;
 use App\Repositories\Interfaces\IHallRepository;
@@ -21,18 +22,18 @@ readonly class HallService
     public function getHalls(): array
     {
         $halls = $this->hallRepository->query()
-        ->with('tables')
-        ->get()
-        ->map(fn($hall) => [
-            'id' => $hall->id,
-            'name' => $hall->name,
-            'tables' => count($hall->tables),
-            'seats' => $hall->tables->sum('seats'),
-        ]);
+            ->with('tables')
+            ->get()
+            ->map(fn($hall) => [
+                'id' => $hall->id,
+                'name' => $hall->name,
+                'tables' => count($hall->tables),
+                'seats' => $hall->tables->sum('seats'),
+            ]);
 
         return ResponseAction::build('Halls', [
             'halls' => $halls,
-        ]);
+        ], ResponseStatus::OK->code());
     }
 
     public function getHallsInfo(): array
@@ -61,23 +62,23 @@ readonly class HallService
 
         return ResponseAction::build('Halls info', [
             'halls' => $hallsInfo,
-        ]);
+        ], ResponseStatus::OK->code());
     }
 
-    public function getHall($id): array
+    public function getHall(int $id): array
     {
         $hall = $this->hallRepository->query()
-        ->where('id', $id)
-        ->with('tables')
-        ->first();
+            ->where('id', $id)
+            ->with('tables')
+            ->first();
 
         if (!$hall) {
-            return ResponseAction::build(error: 'Hall not found');
+            return ResponseAction::build(status: ResponseStatus::NOT_FOUND->code(), error: 'Hall not found');
         }
 
         return ResponseAction::build('Hall', [
             'hall' => $hall,
-        ]);
+        ], ResponseStatus::OK->code());
     }
 
     public function createHall(array $hallData): array
@@ -91,10 +92,10 @@ readonly class HallService
 
         return ResponseAction::build('Hall created', [
             'hall' => $hall,
-        ]);
+        ], ResponseStatus::CREATED->code());
     }
 
-    public function updateHall(array $hallData, $id): array
+    public function updateHall(array $hallData, int $id): array
     {
         $hall = $this->hallRepository->update($id, $hallData);
 
@@ -124,7 +125,7 @@ readonly class HallService
 
             return ResponseAction::build('Hall updated', [
                 'hall' => $hall
-            ]);
+            ], ResponseStatus::UPDATED->code());
         }
 
         return ResponseAction::build('Hall updated', [
@@ -132,18 +133,18 @@ readonly class HallService
         ]);
     }
 
-    public function deleteHall($id): array
+    public function deleteHall(int $id): array
     {
         $hall = $this->hallRepository->find($id);
 
         if (!$hall) {
-            return ResponseAction::build(error: 'Hall not found');
+            return ResponseAction::build(status: ResponseStatus::NOT_FOUND->code(), error: 'Hall not found');
         }
 
         $hall->tables()->delete();
         $hall->delete();
 
-        return ResponseAction::build('Hall deleted');
+        return ResponseAction::build('Hall deleted', status: ResponseStatus::DELETED->code());
     }
 
 }

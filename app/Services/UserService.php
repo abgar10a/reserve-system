@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Actions\ResponseAction;
+use App\Enums\ResponseStatus;
 use App\Repositories\Interfaces\IUserRepository;
 
 readonly class UserService
@@ -12,42 +13,27 @@ readonly class UserService
 
     }
 
-    public function updateUser($userData, $id): array
+    public function updateUser(array $userData): array
     {
-        if (empty($userData)) {
-            return ResponseAction::build(error: 'Empty data');
-        }
-
-        if (auth()->id() !== $id) {
-            return ResponseAction::build(error: 'Unauthorized');
-        }
-
-        $user = $this->userRepository->update($userData, $id);
+        $user = $this->userRepository->update($userData, auth()->id());
 
         return ResponseAction::build('User updated successfully', [
             'user' => $user,
-        ]);
+        ], ResponseStatus::UPDATED->code());
     }
 
-    public function getUser($id): array
+    public function getUser(): array
     {
-        if (auth()->id() !== $id) {
-            return ResponseAction::build(error: 'Unauthorized');
-        }
-
-        $user = $this->userRepository->find($id);
+        $user = $this->userRepository->find(auth()->id());
 
         return ResponseAction::build('User found', [
             'user' => $user,
-        ]);
+        ], ResponseStatus::OK->code());
     }
 
-    public function deleteUser($id): array
+    public function deleteUser(): array
     {
-        if (auth()->id() !== $id) {
-            return ResponseAction::build(error: 'Unauthorized');
-        }
-        $user = $this->userRepository->find($id);
+        $user = $this->userRepository->find(auth()->id());
 
         $tokens = $user->tokens();
 
@@ -58,6 +44,6 @@ readonly class UserService
 
         $user->delete();
 
-        return ResponseAction::build('User deleted successfully');
+        return ResponseAction::build('User deleted successfully', status: ResponseStatus::DELETED->code());
     }
 }

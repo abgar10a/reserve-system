@@ -3,103 +3,44 @@
 namespace App\Http\Controllers;
 
 use App\Actions\ResponseAction;
-use App\Enums\OrderStatus;
+use App\Http\Requests\StoreOrderRequest;
+use App\Http\Requests\UpdateOrderRequest;
 use App\Services\OrderService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class OrderController extends Controller
 {
-    public function __construct(private OrderService $orderService)
+    public function __construct(private readonly OrderService $orderService)
     {
 
     }
 
     public function index(): ?JsonResponse
     {
-        try {
-            $orderResponse = $this->orderService->getOrdersForUser();
-
-            if (isset($orderResponse['error'])) {
-                return ResponseAction::error($orderResponse['error']);
-            }
-
-            return ResponseAction::successData($orderResponse['message'], $orderResponse);
-        } catch (\Throwable $th) {
-            return ResponseAction::error($th->getMessage(), ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return ResponseAction::handleResponse($this->orderService->getOrdersForUser());
     }
 
-    public function store(Request $request): ?JsonResponse
+    public function store(StoreOrderRequest $request): ?JsonResponse
     {
-        try {
-            $orderData = $request->validate([
-                'start' => 'required|date',
-                'end' => 'required|date',
-                'entity_type' => 'required|string|in:table,hall',
-                'entity_id' => 'required|numeric'
-            ]);
+        $orderData = $request->validated();
 
-            $orderResponse = $this->orderService->createOrder($orderData);
-
-            if (isset($orderResponse['error'])) {
-                return ResponseAction::error($orderResponse['error']);
-            }
-
-            return ResponseAction::successData($orderResponse['message'], $orderResponse);
-        } catch (\Throwable $th) {
-            return ResponseAction::error($th->getMessage(), ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return ResponseAction::handleResponse($this->orderService->createOrder($orderData));
     }
 
-    public function update(Request $request, $id): ?JsonResponse
+    public function update(UpdateOrderRequest $request, $id): ?JsonResponse
     {
-        try {
-            $orderData = $request->validate([
-                'status' => 'required|in:'.implode(',', OrderStatus::all())
-            ]);
+        $orderData = $request->validated();
 
-            $orderResponse = $this->orderService->updateOrder($orderData['status'], $id);
-
-            if (isset($orderResponse['error'])) {
-                return ResponseAction::error($orderResponse['error']);
-            }
-
-            return ResponseAction::successData($orderResponse['message'], $orderResponse);
-        } catch (\Throwable $th) {
-            return ResponseAction::error($th->getMessage(), ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return ResponseAction::handleResponse($this->orderService->updateOrder($orderData['status'], $id));
     }
 
     public function show($id): ?JsonResponse
     {
-        try {
-            $orderResponse = $this->orderService->getOrder($id);
-
-            if (isset($orderResponse['error'])) {
-                return ResponseAction::error($orderResponse['error']);
-            }
-
-            return ResponseAction::successData($orderResponse['message'], $orderResponse);
-        } catch (\Throwable $th) {
-            return ResponseAction::error($th->getMessage(), ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return ResponseAction::handleResponse($this->orderService->getOrder($id));
     }
 
     public function delete($id): ?JsonResponse
     {
-        try {
-            $orderResponse = $this->orderService->deleteOrder($id);
-
-            if (isset($orderResponse['error'])) {
-                return ResponseAction::error($orderResponse['error']);
-            }
-
-            return ResponseAction::success($orderResponse['message']);
-        } catch (\Throwable $th) {
-            return ResponseAction::error($th->getMessage(), ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return ResponseAction::handleResponse($this->orderService->deleteOrder($id));
     }
 }

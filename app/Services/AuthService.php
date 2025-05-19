@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Actions\ResponseAction;
+use App\Enums\ResponseStatus;
 use App\Models\User;
 use App\Repositories\Interfaces\IUserRepository;
 use Illuminate\Support\Facades\Hash;
@@ -18,7 +19,8 @@ readonly class AuthService
 
     }
 
-    public function register(array $userData): array
+    public
+    function register(array $userData): array
     {
         try {
             $user = $this->userRepository->create($userData);
@@ -31,13 +33,15 @@ readonly class AuthService
             return [
                 ...$this->login($credentials),
                 'message' => 'User created successfully',
+                'status' => ResponseStatus::CREATED->code(),
             ];
         } catch (Throwable $th) {
             return ResponseAction::build(error: $th->getMessage());
         }
     }
 
-    public function login(array $credentials): array
+    public
+    function login(array $credentials): array
     {
         try {
             if ($user = $this->attempt($credentials)) {
@@ -47,16 +51,17 @@ readonly class AuthService
                 return ResponseAction::build('User logged in successfully', [
                     'token' => $token,
                     'user' => $user,
-                ]);
+                ], ResponseStatus::OK->code());
             }
 
-            return ResponseAction::build(error: 'Invalid credentials');
+            return ResponseAction::build(status: ResponseStatus::UNAUTHORIZED->code(), error: 'Invalid credentials');
         } catch (Throwable $th) {
-            return ResponseAction::build(error: $th->getMessage());
+            return ResponseAction::build(status: ResponseStatus::INTERNAL_ERROR->code(), error: $th->getMessage());
         }
     }
 
-    public function attempt(array $credentials): ?User
+    public
+    function attempt(array $credentials): ?User
     {
         $user = $this->userRepository->findByEmail($credentials['email']);
 
@@ -67,7 +72,8 @@ readonly class AuthService
         return null;
     }
 
-    public function logout(): array
+    public
+    function logout(): array
     {
         try {
             $user = auth()->user();
@@ -75,23 +81,27 @@ readonly class AuthService
             if ($user->token()) {
                 $user->token()->revoke();
 
-                return ResponseAction::build('User logged out successfully');
+                return ResponseAction::build('User logged out successfully', status: ResponseStatus::OK->code());
             }
 
-            return ResponseAction::build(error: 'Not authenticated');
+            return ResponseAction::build(status: ResponseStatus::UNAUTHORIZED->code(), error: 'Not authenticated');
         } catch (Throwable $th) {
-            return ResponseAction::build(error: $th->getMessage());
+            return ResponseAction::build(status: ResponseStatus::INTERNAL_ERROR->code(), error: $th->getMessage());
         }
     }
 
-    public function handleOauthCallback($provider): array
+    public function handleOauthCallback(string $provider, string $token): array
     {
-        $socialUser = Socialite::driver($provider)->stateless()->user();
+        $socialUser = Socialite::driver($provider)->userFromToken($token);
+
+        if (empty($socialUser)) {
+            return ResponseAction::build(status: ResponseStatus::UNAUTHORIZED->code(), error: 'Invalid token');
+        }
 
         $user = $this->userRepository->findByEmail($socialUser->getEmail());
+        $password = config('app.test_mode', false) ? '12345678' : Str::random(16);
 
         if (!$user) {
-            $password = config('app.test_mode', false) ? '12345678' : Str::random(8);
             return $this->register([
                 'email' => $socialUser->getEmail(),
                 'name' => $socialUser->getName(),
@@ -99,15 +109,22 @@ readonly class AuthService
             ]);
         }
 
-        $token = $user->createToken('API Token')->accessToken;
-
-        return ResponseAction::build('User logged in successfully', [
-            'token' => $token,
-            'user' => $user,
+        $user->update([
+            'password' => $password,
         ]);
+
+        return [
+            ...$this->login([
+                'email' => $user->email,
+                'password' => $password,
+            ]),
+            'message' => 'User created successfully',
+            'status' => ResponseStatus::CREATED->code(),
+        ];
     }
 
-    public function createToken($credentials)
+    public
+    function createToken(array $credentials)
     {
         $response = Http::asForm()->post(config('services.passport.token_endpoint'), [
             'grant_type' => 'password',
@@ -119,5 +136,38 @@ readonly class AuthService
         ]);
 
         return $response->json();
+    }
+
+    public function refreshAccessToken()
+    {
+        $user = auth()->user();
+
+        $response = Http::post(config('services.oauth_server.uri') . '/oauth/token', [
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $user->token->refresh_token,
+            'client_id' => config('services.passport.password_client_id'),
+            'client_secret' => config('services.passport.password_client_secret'),
+//            'redirect_uri' => config('services.passport.redirect'),
+            'scope' => ''
+        ]);
+
+        if ($response->status() !== 200) {
+            $user->token->revoke();
+
+            return ResponseAction::build(status: ResponseStatus::INTERNAL_ERROR->code(), error: 'Something went wrong');
+        }
+
+        $response = $response->json();
+        $user->token->update([
+            'access_token' => $response['access_token'],
+            'expires_in' => $response['expires_in'],
+            'refresh_token' => $response['refresh_token']
+        ]);
+
+        return ResponseAction::build('Token refreshed successfully', [
+            'access_token' => $response['access_token'],
+            'expires_in' => $response['expires_in'],
+            'refresh_token' => $response['refresh_token']
+        ], ResponseStatus::OK->code());
     }
 }

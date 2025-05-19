@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Actions\ResponseAction;
-use App\Enums\OrderStatus;
+use App\Http\Requests\UpdateUserRequest;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class UserController extends Controller
 {
@@ -16,53 +14,20 @@ class UserController extends Controller
 
     }
 
-    public function update(Request $request, $id): ?JsonResponse
+    public function update(UpdateUserRequest $request): ?JsonResponse
     {
-        try {
-            $userData = $request->validate([
-                'name' => 'nullable|string|max:255',
-                'email' => 'nullable|string|email|max:255',
-            ]);
+        $userData = $request->validated();
 
-            $userResponse = $this->userService->updateUser($userData, $id);
-
-            if (isset($userResponse['error'])) {
-                return ResponseAction::error($userResponse['error']);
-            }
-
-            return ResponseAction::successData($userResponse['message'], $userResponse);
-        } catch (\Throwable $th) {
-            return ResponseAction::error($th->getMessage(), ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return ResponseAction::handleResponse($this->userService->updateUser($userData));
     }
 
-    public function show($id): ?JsonResponse
+    public function show(): ?JsonResponse
     {
-        try {
-            $userResponse = $this->userService->getUser($id);
-
-            if (isset($userResponse['error'])) {
-                return ResponseAction::error($userResponse['error']);
-            }
-
-            return ResponseAction::successData($userResponse['message'], $userResponse);
-        } catch (\Throwable $th) {
-            return ResponseAction::error($th->getMessage(), ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return ResponseAction::handleResponse($this->userService->getUser());
     }
 
-    public function delete($id): ?JsonResponse
+    public function delete(): ?JsonResponse
     {
-        try {
-            $userResponse = $this->userService->deleteUser($id);
-
-            if (isset($userResponse['error'])) {
-                return ResponseAction::error($userResponse['error']);
-            }
-
-            return ResponseAction::success($userResponse['message']);
-        } catch (\Throwable $th) {
-            return ResponseAction::error($th->getMessage(), ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return ResponseAction::handleResponse($this->userService->deleteUser());
     }
 }

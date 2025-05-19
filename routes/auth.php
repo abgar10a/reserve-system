@@ -11,7 +11,7 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/{provider}', [AuthController::class, 'redirectToProvider']);
 
-    Route::get('/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
+    Route::post('/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
 });
 
 

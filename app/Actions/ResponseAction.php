@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 
 class ResponseAction
 {
-    public static function successData(string $message, $data = null, int $status = 200): JsonResponse
+    public static function successData(string $message, array $data = null, int $status = 200): JsonResponse
     {
         unset($data['message']);
 
@@ -30,11 +30,12 @@ class ResponseAction
         ], $status);
     }
 
-    public static function build(string $message = null, array $data = [], string $error = null): array
+    public static function build(string $message = null, array $data = [], int $status = 200, string $error = null): array
     {
         if ($message) {
             return [
                 'message' => $message,
+                'status' => $status,
                 ...$data,
             ];
         }
@@ -42,5 +43,23 @@ class ResponseAction
         return [
             'error' => $error ?: 'Something went wrong',
         ];
+    }
+
+    public static function handleResponse(array $responseData): ?JsonResponse
+    {
+        $status = $responseData['status'] ?? 200;
+        unset($responseData['status']);
+
+        if (isset($responseData['error'])) {
+            return self::error($responseData['error'], $status ?? 400);
+        }
+
+        $dataKeys = array_diff_key($responseData, array_flip(['status', 'message', 'error']));
+
+        if (count($dataKeys)) {
+            return self::successData($responseData['message'], $responseData, $status ?? 200);
+        }
+
+        return self::success($responseData['message'], $status ?? 200);
     }
 }

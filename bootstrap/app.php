@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\ResponseAction;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,5 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(StartSession::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-
+        $exceptions->render(function (Exception $exception) {
+            return ResponseAction::error($exception->getMessage(), $exception->getCode());
+        });
     })->create();
